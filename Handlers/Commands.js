@@ -43,7 +43,8 @@ module.exports = {
         }
 
         const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
-
+        process.env.DISCORD_TOKEN = null
+        
         try {
             const guilds = await client.guilds.fetch();
             for (const [guildId] of guilds) {
