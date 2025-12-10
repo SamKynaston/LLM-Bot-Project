@@ -4,36 +4,36 @@ const { Client, Events, GatewayIntentBits, Collection } = require("discord.js");
 
 const client = new Client(({ intents: [GatewayIntentBits.Guilds] }));
 
-client.once(Events.ClientReady, (readyClient) => {
-    console.log(`Logged in as ${readyClient.user.tag}`)
-});
+// Events Folder
+const eventsPath = path.join(__dirname, 'events')
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith(".js"))
 
-client.on('interactionCreate', async (interaction) => {
-    if (!interaction.isCommand()) return;
+// Commands Folder
+const commandsPath = path.join(__dirname, 'commands');
+const commandFolders = fs.readdirSync(commandsPath);
 
-    const command = client.commands.get(interaction.commandName);
-    if (!command) return;
+for (const file of eventFiles) {
+    const filePath = path.join(eventsPath, file);
+    const event = require(filePath);
 
-    try {
-        await command.execute(interaction);
-    } catch (error) {
-        console.error(error);
-        if (!interaction.replied) {
-            await interaction.reply({ content: 'There was an error!', ephemeral: true });
+    if (Events[event.name]) {
+        if (event.once) {
+            client.once(Events[event.name], (...args) => event.execute(...args, client));
+        } else {
+            client.on(event.name, (...args) => event.execute(...args, client));
         }
     }
-});
+
+    console.log(`Loaded event: ${event.name} from ${file}`);
+}
 
 client.commands = new Collection();
 
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
-
 for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
+	const localCommandsPath = path.join(commandsPath, folder);
+	const commandFiles = fs.readdirSync(localCommandsPath).filter((file) => file.endsWith('.js'));
 	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
+		const filePath = path.join(localCommandsPath, file);
 		const command = require(filePath);
 
 		if ('data' in command && 'execute' in command) {
