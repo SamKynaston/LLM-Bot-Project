@@ -10,6 +10,15 @@ const client = new Client({
 });
 
 client.commands = new Collection();
-client._availableModels = []
+client._availableModels = [];
+client._availablePersonalities = [];
+
+const personalities = require("./Data/personalities.json")
+Object.keys(personalities).forEach(key => {
+    client._availablePersonalities.push({
+        name: key, 
+        value: key
+    });
+});
 
 module.exports = client;

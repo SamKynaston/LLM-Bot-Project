@@ -3,6 +3,7 @@ const path = require("node:path");
 const { Events } = require("discord.js");
 const Utilities = require("../Handlers/Utilities");
 const axios = require("axios");
+const personalities = require("../Data/personalities.json")
 
 const dataPath = path.join(__dirname, "../Data/conversations.json");
 
@@ -21,6 +22,8 @@ module.exports = {
         if (!client._availableModels.some(m => m.value === convo.model)) return;
 
         const userMessage = message.content;
+        const systemMessage = personalities[convo.personality] || personalities["default"];
+        
         convo.messages.push({
             role: "user",
             content: userMessage,
@@ -33,7 +36,10 @@ module.exports = {
         try {
             const response = await axios.post("http://127.0.0.1:1234/v1/chat/completions", {
                 model: "llama-3.2-8x3b-moe-dark-champion-instruct-uncensored-abliterated-18.4b", 
-                messages: convo.messages,
+                messages: [
+                    { role: "system", content: systemMessage },
+                    ...convo.messages
+                ],
                 max_tokens: process.env.MAX_TOKENS
             });
 
