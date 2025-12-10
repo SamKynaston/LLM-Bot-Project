@@ -51,7 +51,7 @@ module.exports = {
                     Routes.applicationGuildCommands(process.env.CLIENT_ID, guildId),
                     { body: commands }
                 );
-                console.log(`✅ Deployed ${data.length} commands to guild ${guildId}`);
+                console.log(`Deployed ${data.length} commands to guild ${guildId}`);
             }
         } catch (error) {
             console.error("Failed to deploy commands:", error);
