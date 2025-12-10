@@ -23,7 +23,7 @@ module.exports = {
                     }
                 }
 
-                console.log(`Loaded event: ${event.name} from ${file}`);
+                console.log(`STARTED ${event.name} from ${file}`);
             }
         }
 }

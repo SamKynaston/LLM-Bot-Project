@@ -26,6 +26,7 @@ module.exports = {
             { role: "system", content: systemMessage },
             ...conversations[key]
         ];
+        console.log(`${interaction.user.username} Response: ${prompt}`)
 
         await interaction.deferReply();
 
@@ -33,12 +34,12 @@ module.exports = {
             const response = await axios.post("http://127.0.0.1:1234/v1/chat/completions", {
                 model: "llama-3.2-8x3b-moe-dark-champion-instruct-uncensored-abliterated-18.4b", 
                 messages,
-                max_tokens: 200
+                max_tokens: process.env.MAX_TOKENS
             });
 
             const answer = response.data.choices?.[0]?.message?.content || "No response from the LLM.";
             conversations[key].push({ role: "system", content: answer });
-            console.log(conversations)
+            console.log(`LLM Response: ${answer}`)
 
             await interaction.editReply(answer);
         } catch (err) {
