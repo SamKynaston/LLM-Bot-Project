@@ -1,6 +1,7 @@
 const fileHandler = require("../Handlers/Files");
 const path = require("node:path");
 const { Events } = require("discord.js");
+const Utilities = require("../Handlers/Utilities");
 const axios = require("axios");
 
 const dataPath = path.join(__dirname, "../Data/conversations.json");
@@ -37,7 +38,13 @@ module.exports = {
             });
 
             const answer = response.data.choices?.[0]?.message?.content || "No response from the LLM.";
-            replyMsg.edit(answer)
+            const chunks = Utilities.splitByWords(answer, 1500);
+
+            await replyMsg.edit(chunks[0]);
+            
+            for (let i = 1; i < chunks.length; i++) {
+                await message.channel.send(chunks[i]);
+            }
 
             convo.messages.push({
                 role: "assistant",
