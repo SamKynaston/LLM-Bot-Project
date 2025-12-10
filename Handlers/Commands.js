@@ -1,3 +1,4 @@
+const axios = require("axios")
 const { REST, Routes } = require("discord.js");
 const fs = require('node:fs');
 const path = require('node:path');
@@ -25,8 +26,21 @@ module.exports = {
         }
     },
 
+    async deployModelOptions(client) {
+       const response = await axios.get("http://127.0.0.1:1234/v1/models");
+
+        if (response) {
+            response.data.data.forEach((item, i) => {
+                client._availableModels.push({name : item.id, value: item.id})
+            });
+        }
+    },
+
     async deployCommands(client) {
         const commands = [];
+        
+        const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
+        await this.deployModelOptions(client)
 
         for (const folder of commandFolders) {
             const localCommandsPath = path.join(commandsPath, folder);
@@ -42,9 +56,6 @@ module.exports = {
             }
         }
 
-        const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
-        process.env.DISCORD_TOKEN = null
-        
         try {
             const guilds = await client.guilds.fetch();
             for (const [guildId] of guilds) {
