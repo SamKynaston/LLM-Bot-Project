@@ -1,9 +1,10 @@
-const { Events } = require("discord.js");
+import { Events, type Interaction } from "discord.js";
+import type { ExtendedClient } from "../Types/Client.js";
 
-module.exports = {
+export default {
     name: Events.InteractionCreate,  
     once: false,
-    async execute(interaction, client) {
+    async execute(interaction: Interaction, client: ExtendedClient) {
         if (!interaction.isCommand()) return;
 
         const command = client.commands.get(interaction.commandName);
