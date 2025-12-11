@@ -11,7 +11,7 @@ const client: ExtendedClient = new Client({
     ]
 }) as ExtendedClient;
 
-client.commands = new Collection();
+client._commands = new Collection();
 client._availableModels = [];
 client._availablePersonalities = [];
 

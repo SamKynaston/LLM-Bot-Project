@@ -1,3 +1,5 @@
+import type { Interaction } from "discord.js";
+
 const { SlashCommandBuilder } = require("discord.js");
 const fileHandler = require("../../Handlers/Files")
 const path = require('node:path');
@@ -6,7 +8,7 @@ const personalities = require("../../Data/personalities.json")
 
 const dataPath = path.join(__dirname, "../../Data/conversations.json");
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName('start')
         .setDescription('Start a new chat with the LLM')
@@ -23,7 +25,7 @@ module.exports = {
 			.addChoices(...client._availablePersonalities),
 	    ),
 
-    async execute(interaction) { 
+    async execute(interaction: Interaction) { 
         await interaction.deferReply();
 
         try {

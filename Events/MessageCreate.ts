@@ -16,7 +16,7 @@ const personalities: Record<string, string> = personalitiesJson;
 
 const dataPath = Path.join(__dirname, "../Data/conversations.json");
 
-module.exports = {
+export default {
     name: Events.MessageCreate,
     once: false,
     

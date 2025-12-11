@@ -7,7 +7,7 @@ export default {
     async execute(interaction: Interaction, client: ExtendedClient) {
         if (!interaction.isCommand()) return;
 
-        const command = client.commands.get(interaction.commandName);
+        const command = client._commands.get(interaction.commandName);
         if (!command) return;
 
         try {

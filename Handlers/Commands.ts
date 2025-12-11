@@ -19,7 +19,7 @@ export default class CommandHandler {
 
                 if ('data' in command && 'execute' in command) {
                     console.log(`STARTED ${filePath}`)
-                    client.commands.set(command.data.name, command);
+                    client._commands.set(command.data.name, command);
                 } else {
                     console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
                 }
