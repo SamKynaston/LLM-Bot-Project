@@ -1,19 +1,20 @@
-const { Client, GatewayIntentBits, Collection } = require("discord.js");
+import { Client, GatewayIntentBits, Collection } from "discord.js";
+import personalities from "./Data/personalities.json" with { type: "json" };
+import type { ExtendedClient } from "./Types/Client.js";
 
-const client = new Client({
+const client: ExtendedClient = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.DirectMessages
     ]
-});
+}) as ExtendedClient;
 
 client.commands = new Collection();
 client._availableModels = [];
 client._availablePersonalities = [];
 
-const personalities = require("./Data/personalities.json")
 Object.keys(personalities).forEach(key => {
     client._availablePersonalities.push({
         name: key, 
@@ -21,4 +22,4 @@ Object.keys(personalities).forEach(key => {
     });
 });
 
-module.exports = client;
+export default client;

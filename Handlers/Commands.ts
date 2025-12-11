@@ -1,19 +1,20 @@
-const axios = require("axios")
-const { REST, Routes } = require("discord.js");
-const fs = require('node:fs');
-const path = require('node:path');
+import Axios from "axios";
+import { REST, Routes } from "discord.js";
+import FS from "node:fs";
+import Path from "node:path";
+import type { ExtendedClient } from "../Types/Client.js";
 
 // Commands Folder
-const commandsPath = path.join(__dirname, '../commands');
-const commandFolders = fs.readdirSync(commandsPath);
+const commandsPath = Path.join(__dirname, '../commands');
+const commandFolders = FS.readdirSync(commandsPath);
 
-module.exports = {
-    execute(client) {
+export default class CommandHandler {
+    static execute(client: ExtendedClient) {
         for (const folder of commandFolders) {
-            const localCommandsPath = path.join(commandsPath, folder);
-            const commandFiles = fs.readdirSync(localCommandsPath).filter((file) => file.endsWith('.js'));
+            const localCommandsPath = Path.join(commandsPath, folder);
+            const commandFiles = FS.readdirSync(localCommandsPath).filter((file) => file.endsWith('.js'));
             for (const file of commandFiles) {
-                const filePath = path.join(localCommandsPath, file);
+                const filePath = Path.join(localCommandsPath, file);
                 const command = require(filePath);
 
                 if ('data' in command && 'execute' in command) {
@@ -24,29 +25,29 @@ module.exports = {
                 }
             }
         }
-    },
+    }
 
-    async deployModelOptions(client) {
-       const response = await axios.get("http://127.0.0.1:1234/v1/models");
+    static async deployModelOptions(client: ExtendedClient) {
+       const response = await Axios.get("http://127.0.0.1:1234/v1/models");
 
         if (response) {
-            response.data.data.forEach((item, i) => {
+            response.data.data.forEach((item: any, i: any) => {
                 client._availableModels.push({name : item.id, value: item.id})
             });
         }
-    },
+    }
 
-    async deployCommands(client) {
+    static async deployCommands(client: ExtendedClient) {
         const commands = [];
         
-        const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
+        const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN ?? "");
         await this.deployModelOptions(client)
 
         for (const folder of commandFolders) {
-            const localCommandsPath = path.join(commandsPath, folder);
-            const commandFiles = fs.readdirSync(localCommandsPath).filter(file => file.endsWith(".js"));
+            const localCommandsPath = Path.join(commandsPath, folder);
+            const commandFiles = FS.readdirSync(localCommandsPath).filter(file => file.endsWith(".js"));
             for (const file of commandFiles) {
-                const filePath = path.join(localCommandsPath, file);
+                const filePath = Path.join(localCommandsPath, file);
                 const command = require(filePath);
                 if ("data" in command && "execute" in command) {
                     commands.push(command.data.toJSON());
@@ -59,8 +60,8 @@ module.exports = {
         try {
             const guilds = await client.guilds.fetch();
             for (const [guildId] of guilds) {
-                const data = await rest.put(
-                    Routes.applicationGuildCommands(process.env.CLIENT_ID, guildId),
+                const data: any = await rest.put(
+                    Routes.applicationGuildCommands(process.env.CLIENT_ID ?? "", guildId),
                     { body: commands }
                 );
                 console.log(`Deployed ${data.length} commands to guild ${guildId}`);

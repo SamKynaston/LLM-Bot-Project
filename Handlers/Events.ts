@@ -1,18 +1,18 @@
-const { Events } = require("discord.js");
-
-const fs = require('node:fs');
-const path = require('node:path');
+import type { ExtendedClient } from "../Types/Client.js";
+import { Events } from "discord.js";
+import FS from "node:fs";
+import Path from "node:path";
 
 // Events Folder
-const eventsPath = path.join(__dirname, '../events')
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith(".js"))
+const eventsPath = Path.join(__dirname, '../events')
+const eventFiles = FS.readdirSync(eventsPath).filter(file => file.endsWith(".js"))
 
-module.exports = {
-    execute(client) {
+export default class EventHandler {
+    static execute(client: ExtendedClient) {
         const validEventNames = Object.values(Events);
 
         for (const file of eventFiles) {
-                const filePath = path.join(eventsPath, file);
+                const filePath = Path.join(eventsPath, file);
                 const event = require(filePath);
 
                 if (validEventNames.includes(event.name)) {
