@@ -15,7 +15,7 @@ const command: ExtendedCommand = {
         try {
             const result = await eval(`(async () => { ${cmd} })()`);
 
-            let output = typeof result === "string" ? result : require("util").inspect(result);
+            let output = typeof result === "string" ? result : (await import("util")).inspect(result);
             if (output.length > 1900) output = output.slice(0, 1900) + "...";
 
             await interaction.editReply(`Result:\n\`\`\`js\n${output}\n\`\`\``);
