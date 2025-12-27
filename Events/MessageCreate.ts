@@ -12,6 +12,12 @@ import { Events } from "discord.js";
 import Utilities from "../Handlers/Utilities.js";
 import Axios from "axios";
 import personalitiesJson from "../Data/personalities.json" with { type: "json" };
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const personalities: Record<string, string> = personalitiesJson;
 
 const dataPath = Path.join(__dirname, "../Data/conversations.json");

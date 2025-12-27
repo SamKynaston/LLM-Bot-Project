@@ -1,43 +1,49 @@
-import type { Interaction } from "discord.js";
+import type { SlashCommandStringOption } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
+import type { ExtendedCommand, PersonalityMap } from "../../Types/Command.js";
+import fileHandler from "../../Handlers/Files.js";
+import path from "node:path";
+import client from "../../client.js";
+import personalities from "../../Data/personalities.json" with { type: "json" };
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
-const { SlashCommandBuilder } = require("discord.js");
-const fileHandler = require("../../Handlers/Files")
-const path = require('node:path');
-const client = require("../../client");
-const personalities = require("../../Data/personalities.json")
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const dataPath = path.join(__dirname, "../../Data/conversations.json");
+const personalitiesTyped = personalities as unknown as PersonalityMap;
 
-export default {
+const command: ExtendedCommand = {
     data: new SlashCommandBuilder()
         .setName('start')
         .setDescription('Start a new chat with the LLM')
-        .addStringOption((option) => option
+        .addStringOption((option: SlashCommandStringOption) => option
 			.setName('model')
 			.setDescription('Select a model to use for this conversation')
 			.setRequired(true)
 			.addChoices(...client._availableModels),
 	    )
-        .addStringOption((option) => option
+        .addStringOption((option: SlashCommandStringOption) => option
 			.setName('personality')
 			.setDescription('Select a personality to use for this conversation')
 			.setRequired(true)
 			.addChoices(...client._availablePersonalities),
 	    ),
 
-    async execute(interaction: Interaction) { 
+    async execute(interaction) { 
         await interaction.deferReply();
-
+        
         try {
             const conversations = fileHandler.loadFile(dataPath);
             const key = `${interaction.guildId || "dm"}-${interaction.channelId}`;
             const selectedModel = interaction.options.getString("model");
-            const selectedPersonality = interaction.options.getString("personality");
+            const selectedPersonality = interaction.options.getString("personality") || "default";
 
-            if (!client._availableModels.some(m => m.value === selectedModel)) {
+            if (!client._availableModels.some((m: { value: any; }) => m.value === selectedModel)) {
                 await interaction.editReply("Oops! This isn't an available model!");
             } else {
-                if (personalities[selectedPersonality]) {
+                if (personalitiesTyped[selectedPersonality]) {
                     if (!conversations[key]) {
                         conversations[key] = {
                             model: selectedModel,
@@ -57,3 +63,5 @@ export default {
         }
     },
 }
+
+export default command;

@@ -2,26 +2,30 @@ import Axios from "axios";
 import { REST, Routes } from "discord.js";
 import FS from "node:fs";
 import Path from "node:path";
-import type { ExtendedClient } from "../Types/Client.js";
+import type { ExtendedClient } from "../Types/Client.ts";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Commands Folder
 const commandsPath = Path.join(__dirname, '../commands');
 const commandFolders = FS.readdirSync(commandsPath);
 
 export default class CommandHandler {
-    static execute(client: ExtendedClient) {
+    static async execute(client: ExtendedClient) {
         for (const folder of commandFolders) {
             const localCommandsPath = Path.join(commandsPath, folder);
-            const commandFiles = FS.readdirSync(localCommandsPath).filter((file) => file.endsWith('.js'));
+            const commandFiles = FS.readdirSync(localCommandsPath).filter((file) => file.endsWith('.ts'));
+
             for (const file of commandFiles) {
                 const filePath = Path.join(localCommandsPath, file);
-                const command = require(filePath);
+                const command = (await import(filePath)).default;
 
-                if ('data' in command && 'execute' in command) {
-                    console.log(`STARTED ${filePath}`)
+                if (command?.data && command?.execute) {
+                    console.log(`STARTED ${command.data.name}`);
                     client._commands.set(command.data.name, command);
-                } else {
-                    console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
                 }
             }
         }
@@ -45,14 +49,13 @@ export default class CommandHandler {
 
         for (const folder of commandFolders) {
             const localCommandsPath = Path.join(commandsPath, folder);
-            const commandFiles = FS.readdirSync(localCommandsPath).filter(file => file.endsWith(".js"));
+            const commandFiles = FS.readdirSync(localCommandsPath).filter(file => file.endsWith(".ts"));
             for (const file of commandFiles) {
                 const filePath = Path.join(localCommandsPath, file);
-                const command = require(filePath);
-                if ("data" in command && "execute" in command) {
+                const command = (await import(filePath)).default;
+
+                if (command?.data && command?.execute) {
                     commands.push(command.data.toJSON());
-                } else {
-                    console.warn(`[WARNING] The command at ${filePath} is missing "data" or "execute".`);
                 }
             }
         }

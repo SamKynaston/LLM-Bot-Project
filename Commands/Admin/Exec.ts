@@ -1,10 +1,12 @@
-const { SlashCommandBuilder } = require("discord.js");
+import type { SlashCommandStringOption } from "discord.js";
+import type { ExtendedCommand } from "../../Types/Command.js";
+import { SlashCommandBuilder } from "discord.js";
 
-module.exports = {
+const command: ExtendedCommand = {
     data: new SlashCommandBuilder()
         .setName('exec')
         .setDescription('Execute local commands')
-        .addStringOption((option) => option.setName('command').setDescription('Command to run').setRequired(true)),
+        .addStringOption((option: SlashCommandStringOption) => option.setName('command').setDescription('Command to run').setRequired(true)),
 
     async execute(interaction) { 
         const cmd = interaction.options.getString("command");
@@ -17,10 +19,12 @@ module.exports = {
             if (output.length > 1900) output = output.slice(0, 1900) + "...";
 
             await interaction.editReply(`Result:\n\`\`\`js\n${output}\n\`\`\``);
-        } catch (err) {
+        } catch (err: Error | any) {
             let errorMsg = err.toString();
             if (errorMsg.length > 1900) errorMsg = errorMsg.slice(0, 1900) + "...";
             await interaction.editReply(`Error:\n\`\`\`js\n${errorMsg}\n\`\`\``);
         }
     },
 }
+
+export default command;
