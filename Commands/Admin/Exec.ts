@@ -8,6 +8,8 @@ const command: ExtendedCommand = {
         .setDescription('Execute local commands')
         .addStringOption((option: SlashCommandStringOption) => option.setName('command').setDescription('Command to run').setRequired(true)),
 
+    permission: 'ADMINISTRATOR',
+
     async execute(interaction) { 
         const cmd = interaction.options.getString("command");
         await interaction.deferReply();

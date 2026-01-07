@@ -50,6 +50,7 @@ export default class CommandHandler {
         for (const folder of commandFolders) {
             const localCommandsPath = Path.join(commandsPath, folder);
             const commandFiles = FS.readdirSync(localCommandsPath).filter(file => file.endsWith(".ts"));
+            
             for (const file of commandFiles) {
                 const filePath = Path.join(localCommandsPath, file);
                 const command = (await import(filePath)).default;
